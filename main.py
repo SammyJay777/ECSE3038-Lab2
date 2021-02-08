@@ -6,7 +6,7 @@ app = Flask(__name__)
 User = {}
 
 
-counter = 0
+DT_count = 0
 Temp = []
 
 @app.route('/profile')
@@ -24,8 +24,7 @@ def profile_post():
      now = datetime.now()
     dt = now.strftime("%d/%m/%Y %H:%M:%S")
    
-    UData = request.json
-    #do the validation 
+    UData = request.json 
     if len(UData) > 0:
         global User
         User = UData
@@ -47,15 +46,14 @@ def profile_patch():
 
     UData = request.json   
 
-    if len(User) > 0:
-        User = UData
+    User = UData
      
-        UData["last_updated"] = dt
-        Success = {
+    UData["last_updated"] = dt
+    Success = {
         "successs":True,
         "data": UData
         }            
-        return jsonify(Success)
+    return jsonify(Success)
 
  
 @app.route("/data")
@@ -64,27 +62,27 @@ def data_get():
 
 @app.route("/data", methods = ["POST"])
 def data_post():
-    global counter
+    global DT_count
     Tnk = request.json
-    counter+=1
-    Tnk["id"] = str(counter)
+    DT_count+=1
+    Tnk["id"] = str(DT_count)
     Temp.append(Tnk)
     return jsonify(Tnk)
 
 @app.route('/data/<int:id>', methods = ["PATCH"])
 def data_patch(id):
     patch = request.json
-    found = False
+    state = False
     for SystemDataFiles in Temp:
         if SystemDataFiles["id"] == str(id):
-            found = True 
+            state = True 
             SystemDataFiles["location"] = patch["location"]
             SystemDataFiles["lat"] = patch["lat"]
             SystemDataFiles["long"] = patch["long"]
             SystemDataFiles["percentage_full"] = patch["percentage_full"]
        
             break 
-    if found == False:
+    if state == False:
         
         return redirect(url_for("data_get"))
     return jsonify(Temp[id-1])
